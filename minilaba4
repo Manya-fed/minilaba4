@@ -1,0 +1,44 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn import linear_model
+
+
+df = pd.read_csv('датасет-1.csv', sep=';')
+
+)
+if df['price'].dtype == object:
+    df['price'] = df['price'].str.replace(',', '.').astype(float)
+
+print("\nТипы данных:")
+print(df.dtypes)
+
+plt.scatter(df['area'], df['price'], color='red')
+plt.xlabel('площадь(кв.м.)')
+plt.ylabel('стоимость(млн.руб)')
+plt.show()
+
+reg = linear_model.LinearRegression()
+reg.fit(df[['area']], df['price'])
+
+print(f"\nКвартира 38 м²: {reg.predict([[38]])[0]:.2f} млн.руб")
+print(f"Квартира 200 м²: {reg.predict([[200]])[0]:.2f} млн.руб")
+
+
+print(f"\nКоэф. a: {reg.coef_[0]}")
+print(f"Коэф. b: {reg.intercept_}")
+print(f"Уравнение: price = {reg.coef_[0]:.4f}*area + {reg.intercept_:.4f}")
+
+plt.scatter(df['area'], df['price'], color='red')
+plt.plot(df['area'], reg.predict(df[['area']]))
+plt.xlabel('площадь(кв.м.)')
+plt.ylabel('стоимость(млн.руб)')
+plt.show()
+
+pred = pd.read_csv('prediction_price.csv', sep=';')
+pred['predicted prices'] = reg.predict(pred[['area']])
+
+print("\nРезультаты предсказания:")
+print(pred)
+
+pred.to_excel('new.xlsx', index=False)
+print("\nФайл сохранен как 'new.xlsx'")
